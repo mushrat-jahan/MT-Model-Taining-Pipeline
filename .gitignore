@@ -1,3 +1,5 @@
 venv
 venv/
 __pycache__/
+input5k.csv
+output_clean.csv
