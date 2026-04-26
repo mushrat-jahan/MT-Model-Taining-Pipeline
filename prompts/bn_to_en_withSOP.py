@@ -95,7 +95,7 @@ You **MUST** return a **valid JSON object** and nothing else.
 """
 
 # Example
-if __name__ == "__main__":
-    sample_bangla = "আমি ভাত খাই।"  # "I eat rice."
-    prompt = get_SOP_prompt(sample_bangla, "Bangla", "English")
-    print(prompt)
+# if __name__ == "__main__":
+#     sample_bangla = "আমি ভাত খাই।"  # "I eat rice."
+#     prompt = get_SOP_prompt(sample_bangla, "Bangla", "English")
+#     print(prompt)
