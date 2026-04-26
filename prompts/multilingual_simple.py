@@ -27,4 +27,4 @@ Return ONLY valid JSON:
 # if __name__ == "__main__":
 #     sample_bangla = "আমি ভাত খাই।"
 #     prompt = get_multilingual_simple(sample_bangla, "Bangla", "English")
-#     print(prompt)
+#     print(prompt) 
