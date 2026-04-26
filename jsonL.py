@@ -22,7 +22,7 @@ def save_as_jsonl(input_csv_path: str, output_jsonl_path: str):
 
 
 # if __name__ == "__main__":
-#     input_csv = "D:\\office\\EBLICT\\Model training for MT\\Dataset\\input5k.csv"
-#     output_jsonl = "D:\\office\\EBLICT\\Model training for MT\\Dataset\\processed_data.jsonl"
+#     input_csv = "Model training for MT\\Dataset\\input5k.csv"
+#     output_jsonl = "Model training for MT\\Dataset\\processed_data.jsonl"
 
 #     save_as_jsonl(input_csv, output_jsonl)
