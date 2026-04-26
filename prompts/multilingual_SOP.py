@@ -62,7 +62,7 @@ You **MUST** return a **valid JSON object** and nothing else.
 
 
 # Example usage
-if __name__ == "__main__":
-    print(translator_system_prompt("Bangla", "English"))
-    print(translator_system_prompt("Bangla", "Hindi"))
-    print(translator_system_prompt("Bangla", "Arabic"))
+# if __name__ == "__main__":
+#     print(translator_system_prompt("Bangla", "English"))
+#     print(translator_system_prompt("Bangla", "Hindi"))
+#     print(translator_system_prompt("Bangla", "Arabic"))
