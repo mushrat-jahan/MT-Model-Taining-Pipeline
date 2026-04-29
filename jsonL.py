@@ -39,6 +39,6 @@ def split_and_save(input_csv_path: str, output_dir: str):
 
 
 if __name__ == "__main__":
-    input_csv  = "D:\\office\\EBLICT\\Model training for MT\\Dataset\\input5k.csv"
-    output_dir = "D:\\office\\EBLICT\\Model training for MT\\Dataset\\splits"
+    input_csv  = "Model training for MT\\Dataset\\input5k.csv"
+    output_dir = "Model training for MT\\Dataset\\splits"
     split_and_save(input_csv, output_dir)
