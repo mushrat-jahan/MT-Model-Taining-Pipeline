@@ -1,5 +1,5 @@
 
-def get_SOP_prompt(source_text: str, source_language: str, target_language: str) -> str:
+def get_SOP_prompt( source_language: str, target_language: str) -> str:
     return f"""
 ## **[SECTION 1: CORE ROLE & TRANSLATION Update]**
 
