@@ -77,7 +77,8 @@ torchao==0.17.0
 torchvision==0.25.0
 tqdm==4.67.3
 transformers==5.5.0
-triton-windows==3.6.0.post26
+#triton-windows==3.6.0.post26
+triton==3.6.0
 trl==0.24.0
 typeguard==4.5.1
 typer==0.25.0

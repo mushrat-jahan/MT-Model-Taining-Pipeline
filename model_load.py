@@ -4,12 +4,13 @@ import json
 import torch
 from unsloth import FastLanguageModel
 from prompts.simple_prompt import get_simple_translation_prompt
+from jsonL import split_and_save
 
 
 def load_model(model_name: str = "unsloth/gemma-4-E2B-it"):
     model, tokenizer = FastLanguageModel.from_pretrained(
         model_name = model_name,
-        max_sequence_length = 2048,
+        max_seq_length = 2048,
         dtype = None,
         load_in_4bit = True,
     )
@@ -47,7 +48,7 @@ def collate_batch(batch,tokenizer):
         full_texts.append(prompt + completion + tokenizer.eos_token)
  
     encodings = tokenizer(
-        full_texts,
+        text = full_texts,
         return_tensors="pt",
         padding=True,
         truncation=True,
@@ -77,11 +78,11 @@ def collate_batch(batch,tokenizer):
 if __name__ == "__main__":
     model, tokenizer = load_model()
     print("Model loaded successfully!")
-    print(f"Tokenizer vocab size: {tokenizer.vocab_size}")
+    print(f"Tokenizer vocab size: {tokenizer.tokenizer.vocab_size}")
 
     sample_batch = [
         {
-            "source_text": "আমি স্কুলে যাই",
+            "source": "আমি স্কুলে যাই",
             "source_language": "Bangla",
             "target_language": "English",
             "target": "I go to school"
