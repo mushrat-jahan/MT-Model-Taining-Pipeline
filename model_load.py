@@ -1,6 +1,4 @@
-# from transformers import AutoTokenizer, AutoModelForCausalLM
 import json
-
 import torch
 from unsloth import FastLanguageModel
 from prompts.simple_prompt import get_simple_translation_prompt
@@ -24,7 +22,7 @@ def load_model(model_name: str = "unsloth/gemma-4-E2B-it"):
         r = 16,
         target_modules = ["q_proj", "k_proj", "v_proj", "o_proj", "gate_proj", "up_proj", "down_proj"],
         lora_alpha = 16,
-        lora_dropout = 0.05,
+        lora_dropout = 0,
         bias = "none",
         use_gradient_checkpointing = "unsloth",
         random_state = 42,
@@ -44,7 +42,6 @@ def collate_batch(batch,tokenizer):
         
         completion = json.dumps({"translated_text": record["target"]}, ensure_ascii=False)
 
-        # completion = f'{{"translated_text": "{record["target"]}"}}'
         full_texts.append(prompt + completion + tokenizer.eos_token)
  
     encodings = tokenizer(
@@ -66,6 +63,16 @@ def collate_batch(batch,tokenizer):
             source_language=record["source_language"],
             target_language=record["target_language"]
         )
+
+    #prompt length to mask label
+        prompt_tokenized = tokenizer(
+            text = prompt,
+            add_special_tokens=False,
+            truncation=True,
+            max_length=2048,
+        )
+        prompt_length = len(prompt_tokenized["input_ids"][0])
+        labels[i, :prompt_length] = -100
     
     labels[labels == tokenizer.pad_token_id] = -100
  
@@ -75,22 +82,38 @@ def collate_batch(batch,tokenizer):
         "labels": labels,
     }
 
-if __name__ == "__main__":
-    model, tokenizer = load_model()
-    print("Model loaded successfully!")
-    print(f"Tokenizer vocab size: {tokenizer.tokenizer.vocab_size}")
+# if __name__ == "__main__":
+#     model, tokenizer = load_model()
+#     print("Model loaded successfully!")
 
-    sample_batch = [
-        {
-            "source": "আমি স্কুলে যাই",
-            "source_language": "Bangla",
-            "target_language": "English",
-            "target": "I go to school"
-        }
-    ]
-    batch = collate_batch(sample_batch, tokenizer)
+#     sample_batch = [
+#         {
+#             "source": "আমি স্কুলে যাই",
+#             "source_language": "Bangla",
+#             "target_language": "English",
+#             "target": "I go to school"
+#         },
+#         {
+#         "source": "সে বই পড়ে",
+#         "source_language": "Bangla",
+#         "target_language": "English",
+#         "target": "He reads a book"
+#        }
+#     ]
+#     batch = collate_batch(sample_batch, tokenizer)
 
-    print("Batch created successfully!")
-    print("input_ids shape:", batch["input_ids"].shape)
-    print("attention_mask shape:", batch["attention_mask"].shape)
-    print("labels shape:", batch["labels"].shape)
+#     print("Batch created successfully!")
+#     print("input_ids shape:", batch["input_ids"].shape)
+#     print("attention_mask shape:", batch["attention_mask"].shape)
+#     print("labels shape:", batch["labels"].shape)
+
+#     print(tokenizer.decode(batch["input_ids"][0]))
+#     print(batch["labels"][0])
+
+#     #forword pass test
+#     outputs = model(**batch)
+#     print("Loss:", outputs.loss.item())#
+
+#     #Backward pass test
+#     outputs.loss.backward()
+#     print("Backward pass completed successfully!")
