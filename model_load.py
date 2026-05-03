@@ -8,7 +8,7 @@ from jsonL import split_and_save
 def load_model(model_name: str = "unsloth/gemma-4-E2B-it"):
     model, tokenizer = FastLanguageModel.from_pretrained(
         model_name = model_name,
-        max_seq_length = 2048,
+        max_seq_length = 4096,
         dtype = None,
         load_in_4bit = True,
     )
@@ -49,7 +49,7 @@ def collate_batch(batch,tokenizer):
         return_tensors="pt",
         padding=True,
         truncation=True,
-        max_length=2048,
+        max_length=4096,
     )
  
     input_ids = encodings["input_ids"].to(device)
@@ -69,7 +69,7 @@ def collate_batch(batch,tokenizer):
             text = prompt,
             add_special_tokens=False,
             truncation=True,
-            max_length=2048,
+            max_length=4096,
         )
         prompt_length = len(prompt_tokenized["input_ids"][0])
         labels[i, :prompt_length] = -100
