@@ -1,9 +1,11 @@
 import json
 import torch
+import os
 from unsloth import FastLanguageModel
 from prompts.simple_prompt import get_simple_translation_prompt
 from jsonL import split_and_save
 
+os.environ["CUDA_VISIBLE_DEVICES"] = "1"
 
 def load_model(model_name: str = "unsloth/gemma-4-E2B-it"):
     model, tokenizer = FastLanguageModel.from_pretrained(

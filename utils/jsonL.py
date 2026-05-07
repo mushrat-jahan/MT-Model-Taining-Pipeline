@@ -1,7 +1,12 @@
+import sys
 import json
 import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+
 from data_processing import DataLoader
 from sklearn.model_selection import train_test_split
+
+os.environ["CUDA_VISIBLE_DEVICES"] = "1"
 
 def save_as_jsonl(data, output_path):
     with open(output_path, "w", encoding="utf-8") as f:
@@ -37,8 +42,8 @@ def split_and_save(input_csv_path: str, output_dir: str):
     save_as_jsonl(test_data,  os.path.join(output_dir, "test.jsonl"))
     save_as_jsonl(val_data,   os.path.join(output_dir, "validation.jsonl"))
 
+INPUT_CSV  = "/home/mushrat/MT-model-training-pipeline/MT-Model-Taining-Pipeline/Dataset/(AcceptedMachineTranslationData-2026-04-22 - (AcceptedMachineTranslationData-2026-04-22.csv"
+SPLITS_DIR = "MT-Model-Taining-Pipeline/output"
 
-if __name__ == "__main__":
-    input_csv  = "Model training for MT\\Dataset\\input5k.csv"
-    output_dir = "Model training for MT\\Dataset\\splits"
-    split_and_save(input_csv, output_dir)
+# if __name__ == "__main__":
+#     split_and_save(INPUT_CSV, SPLITS_DIR)

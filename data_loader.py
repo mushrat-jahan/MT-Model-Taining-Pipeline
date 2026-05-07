@@ -1,7 +1,6 @@
 from data_processing import DataLoader
 
-loader = DataLoader("D:\\office\\EBLICT\\Model training for MT\\Dataset\\input5k.csv")
+loader = DataLoader("MT-Model-Taining-Pipeline/Dataset/(AcceptedMachineTranslationData-2026-04-22 - (AcceptedMachineTranslationData-2026-04-22.csv")
 print(loader.get_cleaned_data().head())
-
-loader.save_cleaned_data("D:\\office\\EBLICT\\Model training for MT\\Dataset\\processed_data.csv", index=False)
+loader.save_cleaned_data("/home/mushrat/MT-model-training-pipeline/MT-Model-Taining-Pipeline/output/processed_data.csv", index=False)
 

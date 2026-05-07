@@ -6,6 +6,8 @@ import torch
 from unsloth import FastLanguageModel
 from prompts.simple_prompt import get_simple_translation_prompt
 
+os.environ["CUDA_VISIBLE_DEVICES"] = "1"
+
 #data_loader 
 
 loader = DataLoader("D:\\office\\EBLICT\\Model training for MT\\Dataset\\input5k.csv")
