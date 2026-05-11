@@ -2,8 +2,9 @@ import json
 import torch
 import os
 from unsloth import FastLanguageModel
+from datasets import Dataset
 from prompts.simple_prompt import get_simple_translation_prompt
-from jsonL import split_and_save
+from utils.jsonL import split_and_save
 
 os.environ["CUDA_VISIBLE_DEVICES"] = "1"
 

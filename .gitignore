@@ -6,5 +6,7 @@ Dataset/
 jsonl_output.py
 unsloth_compiled_cache/
 MT-Model-Taining-Pipeline.egg-info/
-MT-Model-Taining-Pipeline/output
-
+MT-Model-Taining-Pipeline/output/
+unsloth_compiled_cache/
+output1/
+output/
