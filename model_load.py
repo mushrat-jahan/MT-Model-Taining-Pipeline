@@ -16,10 +16,11 @@ def load_model(model_name: str = "unsloth/gemma-4-E2B-it"):
         load_in_4bit = True,
     )
     
+    tokenizer.chat_template_kwargs = {"enable_thinking": False}
     if tokenizer.pad_token is None:
         tokenizer.pad_token = tokenizer.eos_token
-
-    # Attach LoRA adapters for fine-tuning
+    
+ # Attach LoRA adapters for fine-tuning
     model = FastLanguageModel.get_peft_model(
         model,
         r = 16,
@@ -74,7 +75,7 @@ def collate_batch(batch,tokenizer):
             truncation=True,
             max_length=4096,
         )
-        prompt_length = len(prompt_tokenized["input_ids"][0])
+        prompt_length = len(prompt_tokenized["input_ids"])
         labels[i, :prompt_length] = -100
     
     labels[labels == tokenizer.pad_token_id] = -100
@@ -85,38 +86,3 @@ def collate_batch(batch,tokenizer):
         "labels": labels,
     }
 
-# if __name__ == "__main__":
-#     model, tokenizer = load_model()
-#     print("Model loaded successfully!")
-
-#     sample_batch = [
-#         {
-#             "source": "আমি স্কুলে যাই",
-#             "source_language": "Bangla",
-#             "target_language": "English",
-#             "target": "I go to school"
-#         },
-#         {
-#         "source": "সে বই পড়ে",
-#         "source_language": "Bangla",
-#         "target_language": "English",
-#         "target": "He reads a book"
-#        }
-#     ]
-#     batch = collate_batch(sample_batch, tokenizer)
-
-#     print("Batch created successfully!")
-#     print("input_ids shape:", batch["input_ids"].shape)
-#     print("attention_mask shape:", batch["attention_mask"].shape)
-#     print("labels shape:", batch["labels"].shape)
-
-#     print(tokenizer.decode(batch["input_ids"][0]))
-#     print(batch["labels"][0])
-
-#     #forword pass test
-#     outputs = model(**batch)
-#     print("Loss:", outputs.loss.item())#
-
-#     #Backward pass test
-#     outputs.loss.backward()
-#     print("Backward pass completed successfully!")
