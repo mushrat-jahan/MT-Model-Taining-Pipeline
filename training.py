@@ -13,58 +13,49 @@ from utils.jsonL import split_and_save, SPLITS_DIR
 
 os.environ["CUDA_VISIBLE_DEVICES"] = "1"
 
-# Config--------
+# Config
 LORA_DIR = "/home/mushrat/MT-model-training-pipeline/MT-Model-Taining-Pipeline/output/lora"
 GGUF_DIR = "/home/mushrat/MT-model-training-pipeline/MT-Model-Taining-Pipeline/output/model"
 MLFLOW_DIR = "/home/mushrat/MT-model-training-pipeline/MT-Model-Taining-Pipeline/output/mlflow"
+MLFLOW_EXPERIMENT_NAME = "mt_gemma_finetuning"
 MAX_SEQ_LEN = 4096
 BATCH_SIZE = 4
 GRAD_ACCUM = 4
-LOAD_IN_4BIT = True
-LORA_R = 16
-LORA_ALPHA = 16
-LORA_DROPOUT = 0
-LORA_BIAS = "none"
 WARMUP_RATIO = 0.05
 LR_SCHEDULER = "cosine"
 EPOCHS = 10
 LR = 2e-4
 GGUF_QUANT = "q4_k_m"
-MODEL_NAME = "unsloth/gemma-4-E2B-it"
-MLFLOW_EXPERIMENT_NAME = "mt_gemma_finetuning"
-
-
-
-# MLflow ------
+ 
+ 
+# MLflow callback
 class MLflowCallback(TrainerCallback):
     def on_log(self, args, state, control, logs=None, **kwargs):
         if logs:
             metrics = {k: v for k, v in logs.items() if isinstance(v, (int, float))}
             mlflow.log_metrics(metrics, step=state.global_step)
-
+ 
     def on_epoch_end(self, args, state, control, **kwargs):
         mlflow.log_metric("epoch", state.epoch, step=state.global_step)
-
+ 
     def on_evaluate(self, args, state, control, metrics=None, **kwargs):
         if metrics:
             eval_metrics = {k: v for k, v in metrics.items() if isinstance(v, (int, float))}
             mlflow.log_metrics(eval_metrics, step=state.global_step)
-
-
-# ── Formatting function -
+ 
+ 
+# Formatting function
 def format_record(record):
     prompt = get_simple_translation_prompt(
         source_text=record["source"],
         source_language=record["source_language"],
         target_language=record["target_language"],
     )
-    completion = json.dumps(
-        {"translated_text": record["target"]}, ensure_ascii=False
-    )
+    completion = json.dumps({"translated_text": record["target"]}, ensure_ascii=False)
     return {"text": prompt + completion}
-
-
-# ── Load JSONL
+ 
+ 
+# Load JSONL
 def load_jsonl(path: str) -> Dataset:
     records = []
     with open(path, "r", encoding="utf-8") as f:
@@ -81,16 +72,17 @@ def main():
     mlflow.set_tracking_uri(f"file://{MLFLOW_DIR}")
     mlflow.set_experiment(MLFLOW_EXPERIMENT_NAME)
 
-    with mlflow.start_run(run_name=f"{MODEL_NAME.split('/')[-1]}-finetune"):
+# Load model — all model/LoRA config lives in model_load.py
+    print("Loading model")
+    model, tokenizer = load_model()
+    model_name = model.config.name_or_path
+ 
+
+    with mlflow.start_run(run_name=f"{model_name.split('/')[-1]}-finetune"):
 
         mlflow.log_params({
-            "model_name": MODEL_NAME,
+            "model_name": model_name,
             "max_seq_len": MAX_SEQ_LEN,
-            "load_in_4bit": LOAD_IN_4BIT,
-            "lora_r": LORA_R,
-            "lora_alpha": LORA_ALPHA,
-            "lora_dropout": LORA_DROPOUT,
-            "lora_bias": LORA_BIAS,
             "batch_size": BATCH_SIZE,
             "grad_accum": GRAD_ACCUM,
             "epochs": EPOCHS,
@@ -99,15 +91,7 @@ def main():
             "lr_scheduler": LR_SCHEDULER,
             "gguf_quant": GGUF_QUANT,
         })
-
-        # Prepare splits
-        print("Preparing data splits")
-        split_and_save()
-
-        # Load model + LoRA
-        print("Loading model")
-        model, tokenizer = load_model()
-
+        
         # Log GPU info
         if torch.cuda.is_available():
             mlflow.log_params({
@@ -115,6 +99,10 @@ def main():
                 "gpu_memory": f"{torch.cuda.get_device_properties(0).total_memory / 1e9:.1f}GB",
             })
 
+        # Prepare splits
+        print("Preparing data splits")
+        split_and_save()
+        
         # Load dataset
         train_dataset = load_jsonl(os.path.join(SPLITS_DIR, "train.jsonl"))
         val_dataset = load_jsonl(os.path.join(SPLITS_DIR, "validation.jsonl"))
@@ -122,7 +110,7 @@ def main():
         mlflow.log_params({
             "train_samples": len(train_dataset),
             "val_samples": len(val_dataset),
-        })
+            })
 
         # Configure SFTTrainer
         trainer = SFTTrainer(
@@ -131,6 +119,7 @@ def main():
             train_dataset=train_dataset,
             eval_dataset=val_dataset,
             data_collator=lambda batch: collate_batch(batch, tokenizer),
+            callbacks=[MLflowCallback()],
             args=SFTConfig(
                 dataset_text_field="text",
                 max_seq_length=MAX_SEQ_LEN,
